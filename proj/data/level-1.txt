@@ -1,0 +1,14 @@
+Lunedì
+Monday
+Martedì
+Tuesday
+Mercoledì
+Wednesday
+Giovedì
+Thursday
+Venerdì
+Friday
+Sabato
+Saturday
+Domenica
+Sunday
