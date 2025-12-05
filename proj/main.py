@@ -16,8 +16,18 @@ last_name = input("What is your last name? ")
 greeting = f"Hello, {name}."
 print(greeting)
 
+# Define sad, medium, happy, super_happy emojis
+sad_emoji = "\U0001F622"         
+medium_emoji = "\U0001F610"      
+happy_emoji = "\U0001F60A"       
+super_happy_em = "\U0001F601"
+
+FINAL_VOTE = 0
+
 # Loop until user decides to finish
 repeat_test = "no"
+tests_taken = 0
+total_percentage = 0
 while repeat_test != "yes":
     
     menu = "\n1: Maths" + \
@@ -50,6 +60,7 @@ while repeat_test != "yes":
         SUBTRACTION = '-'
         numerator = 1
         answers = "\n"
+        correct_answers = 0
         while numerator <= num_question:
             num1 = random.randint(1, 12)
             num2 = random.randint(1, 12)
@@ -84,22 +95,36 @@ while repeat_test != "yes":
                         except ValueError:
                             print("Invalid input. Please insert a digit.")    
                     solution = (f"{numerator:<4}:{num2:>2} {operator} {num1} = {answer}")
-             # Provide feedback        
+             # Provide feedback                   
             if answer == correct_answer:
                 feedback = "\033[1;95m\u2714\033[0m"
+                correct_answers += 1
             else:
                 feedback = "\033[1;91m\u2718\033[0m should be " + str(correct_answer)
             answers += solution + feedback + "\n"
             numerator += 1
         print(answers)
+        percentage = (correct_answers / num_question) * 100
+        total_percentage += percentage
+        tests_taken += 1
+        if percentage < 50:
+            print(f"The percentage of the aswers is: {percentage:.2f} \033[1;91m{sad_emoji}\033[0m")
+        elif 50 <= percentage < 70:
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;93m{medium_emoji}\033[0m")
+        elif 70 <= percentage < 99:
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;92m{happy_emoji}\033[0m")
+        else:   
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;94m{super_happy_em}\033[0m")
         # Log attempt with timestamp
         log =(f"\n{name} {last_name} - {topic} - {now.strftime('%B %d, %Y %H:%M:')}")
         if os.path.exists('proj/data/logs.txt'):
             with open ('proj/data/logs.txt', 'a') as f:
-                f.write(log)
+                content = (f"{log} {percentage}%")
+                f.write(content)
         else:
             with open('proj/data/logs.txt', 'w') as f:
-                f.write(log)
+                content = (f"{log} {percentage}%")
+                f.write(content)
         repeat_test = input("Are you finished (yes/no)? ")      
 
     # Language quiz
@@ -120,7 +145,7 @@ while repeat_test != "yes":
             positive_feedback = 0
             with open("proj/data/level-1.txt") as file:
                 lines = file.readlines()
-                total_lines = len(lines)
+                total_lines = len(lines)                    
             for line in range(0, len(lines) - 1, 2):
                 answer = input(lines[line].rstrip() + " = ")
                 correct_answer = lines[line+1].rstrip()
@@ -129,6 +154,7 @@ while repeat_test != "yes":
                     positive_feedback += 1
                 else:
                     feedback = (f"{answer}\033[1;91m\u2718\033[0m should be {correct_answer}")
+
                 solution = (f"{lines[line].rstrip()} = {answer}")
                 answers += solution + feedback + "\n"
         elif lang_level == 2:
@@ -161,6 +187,7 @@ while repeat_test != "yes":
                     positive_feedback += 1
                 else:
                     feedback = (f"{answer}\033[1;91m\u2718\033[0m should be {correct_answer}")
+                    line_counter += 1
                 solution = (f"{lines[line].rstrip()} = {answer}")
                 answers += solution + feedback + "\n"
         elif lang_level == 4:
@@ -196,12 +223,23 @@ while repeat_test != "yes":
                 solution = (f"{lines[line].rstrip()} = {answer}")
                 answers += solution + feedback + "\n"
         print(answers + "\n")
+        percentage = ((positive_feedback / (total_lines/2)) * 100)
+        total_percentage += percentage
+        tests_taken += 1
+        if percentage < 50:
+            print(f"The percentage of the aswers is: {percentage:.2f} \033[1;91m{sad_emoji}\033[0m")
+        elif 50 <= percentage < 70:
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;93m{medium_emoji}\033[0m")
+        elif 70 <= percentage < 99:
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;92m{happy_emoji}\033[0m")
+        else:   
+            print(f"The percentage of the correct aswers is: {percentage:.2f} \033[1;94m{super_happy_em}\033[0m")
 
         # Promotion logic based on score
         try:
-            if ((positive_feedback / (total_lines/2)) * 100) > 70 and lang_level < 5:
+            if percentage > 70 and lang_level < 5:
                 print(f"\nThe next time you use this program you should start with level {int(lang_level+1)}.")
-            elif ((positive_feedback / (total_lines/2)) * 100) > 70 and lang_level == 5:
+            elif percentage > 70 and lang_level == 5:
                 print("Congratulations! You completed this course!")
         except ZeroDivisionError:
             continue
@@ -210,12 +248,16 @@ while repeat_test != "yes":
         log =(f"\n{name} {last_name} - {topic} - {now.strftime('%B %d, %Y %H:%M:')}")
         if os.path.exists('proj/data/logs.txt'):
             with open ('proj/data/logs.txt', 'a') as f:
-                f.write(log)
+                content = (f"{log} {percentage:2f}%")
+                f.write(content)
         else:
             with open('proj/data/logs.txt', 'w') as f:
-                f.write(log)
+                content = (f"{log} {percentage:2f}")
+                f.write(content)
         repeat_test = input("Are you finished (yes/no)? ")
         
 
 # Timestamp and logboook confirmation
 print("\nYour teacher can view details in logs.txt.")
+FINAL_VOTE = total_percentage / tests_taken
+print(f"Your final average score across all tests is: {FINAL_VOTE:.2f}%")
